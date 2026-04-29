@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Content Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex">
+<!-- SIDEBAR -->
+<div class="w-64 h-screen bg-black bg-opacity-70 p-5 backdrop-blur-lg">
+  <h2 class="text-2xl font-bold mb-8">🚀 Studio</h2>
+  <ul>
+    <li class="mb-4"><a href="/">🏠 Dashboard</a></li>
+    <li class="mb-4"><a href="/generator">✨ Generator</a></li>
+    <li class="mb-4"><a href="/analyzer">📊 Analyzer</a></li>
+    <li class="mb-4"><a href="/dashboard">📈 Analytics</a></li>
+  </ul>
+</div>
+
+<!-- MAIN -->
+<div class="flex-1 p-10 bg-black bg-opacity-60 backdrop-blur-sm text-center">
+
+  <h1 class="text-3xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+    Content Generator
+  </h1>
+
+  <select id="niche" class="p-3 text-black rounded">
+    <option value="fitness">Fitness</option>
+    <option value="fashion">Fashion</option>
+    <option value="tech">Tech</option>
+    <option value="business">Business</option>
+  </select>
+
+  <br><br>
+
+  <button onclick="generate()" 
+    class="px-6 py-3 bg-blue-500 rounded hover:bg-blue-600 transition">
+    Generate Content
+  </button>
+
+  <button onclick="bestTime()" 
+    class="ml-4 px-4 py-2 bg-green-500 rounded hover:bg-green-600">
+    Suggest Best Time
+  </button>
+
+  <!-- Loader -->
+  <div id="loader" class="hidden mt-6">
+    <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 mx-auto"></div>
+  </div>
+
+  <!-- Output -->
+  <div id="output" class="mt-10"></div>
+  <p id="timeResult" class="mt-4 text-green-400"></p>
+
+</div>
+
+<script>
+function generate() {
+  document.getElementById('loader').classList.remove('hidden');
+  document.getElementById('output').innerHTML = "";
+
+  fetch('/generate-content', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      niche: document.getElementById('niche').value
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('loader').classList.add('hidden');
+
+    document.getElementById('output').innerHTML =
+      `<div class="bg-white bg-opacity-10 backdrop-blur-lg p-6 rounded-xl shadow-lg transition transform hover:scale-105">
+        <h2 class="text-xl font-bold">${data.idea}</h2>
+        <p class="mt-2">${data.caption}</p>
+        <p class="mt-2 text-blue-400">${data.hashtags}</p>
+      </div>`;
+  });
+}
+
+function bestTime() {
+  fetch('/best-time')
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('timeResult').innerText = data.time;
+  });
+}
+</script>
+
+</body>
+</html>
